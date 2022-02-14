@@ -1,0 +1,20 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create book form</title>
+</head>
+<body>
+<form th:method="post" th:object="${bookDto}">
+    title: <input th:field="*{title}">
+    <br />
+    isbn: <input th:field="*{isbn}">
+    <br />
+    author: <input th:field="*{author}">
+    <br />
+    <button name="submit" type="submit">Save</button>
+    <button name="redirect" type="redirect">Redirect</button>
+</form>
+<p>title: <span th:text="${bookDto.title}"></span> </p>
+<p>isbn: <span th:text="${bookDto.isbn}"></span> </p>
+<p>author: <span th:text="${bookDto.author}"></span> </p>
+</body>
+</html>
