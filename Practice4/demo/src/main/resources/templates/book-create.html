@@ -1,0 +1,52 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create book form</title>
+</head>
+<body>
+<form th:method="post" th:object="${bookDto}">
+    title: <input th:field="*{title}">
+    <br />
+    isbn: <input th:field="*{isbn}">
+    <br />
+    author: <input th:field="*{author}">
+    <br />
+    <button name="submit" type="submit">Save</button>
+    <button name="showAll" type="submit">Show All</button>
+</form>
+<table border="1">
+    <tr>
+        <th>Title</th>
+        <th>ISBN</th>
+        <th>Author</th>
+    </tr>
+    <tr th:each="book, state : ${bookList}"
+        class="row" th:classappend="${state.odd} ? 'odd-row' : 'even-row'">
+        <td th:utext="${book.title}">Title</td>
+        <td th:utext="${book.isbn}">ISBN</td>
+        <td th:utext="${book.author}">Author</td>
+    </tr>
+</table>
+<br>
+<br>
+<br>
+<form th:method="post">
+    What to find: <input type="text" th:value="${findStr}" name="findStr"/>
+    <button name="find" type="submit">Find Book</button>
+</form>
+
+
+<table border="1">
+    <tr>
+        <th>Title</th>
+        <th>ISBN</th>
+        <th>Author</th>
+    </tr>
+    <tr th:each="book, state : ${foundBookList}"
+        class="row" th:classappend="${state.odd} ? 'odd-row' : 'even-row'">
+        <td th:utext="${book.title}">Title</td>
+        <td th:utext="${book.isbn}">ISBN</td>
+        <td th:utext="${book.author}">Author</td>
+    </tr>
+</table>
+</body>
+</html>
