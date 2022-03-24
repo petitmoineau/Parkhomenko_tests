@@ -5,13 +5,13 @@ import lombok.Data;
 @Data
 public class BookDto {
 
-    private String title;
+    private String booktitle;
     private String isbn;
     private String author;
 
     @Override
     public String toString()
     {
-        return "\"" + this.title + "\" " + this.isbn + " " + this.author;
+        return "\"" + this.booktitle + "\" " + this.isbn + " " + this.author;
     }
 }

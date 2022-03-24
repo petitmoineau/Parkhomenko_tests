@@ -2,51 +2,148 @@
 <head>
     <title>Create book form</title>
 </head>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+<script>
+    console.log('ho');
+
+
+    $(document).ready(function()
+    {
+        $("#inputForm").on("submit", function (event)
+        {
+            event.preventDefault();
+            showBookList();
+        });
+
+        $("#findForm").on("submit", function (event)
+        {
+            event.preventDefault();
+            findBookList();
+        });
+
+        function findBookList()
+        {
+            let stringToFind = $('#findStr').val();
+            $.ajax({
+                url:     "/book/find",
+                type:     "POST",
+                contentType: "application/json",
+                dataType: 'json',
+                data: stringToFind,
+                success: function(data) {
+                    $("#foundForm").empty();
+                    var row = '<table border=\'1\'><tr><th>Title</th><th>ISBN</th><th>Author</th></tr>';
+                    var d = 'bookList';
+                    for (var i = 0; i < data[d].length; i++)
+                    {
+                        row += '<tr><td>'+data[d][i].booktitle+'</td>';
+                        row += '<td>'+data[d][i].isbn+'</td>';
+                        row += '<td>'+data[d][i].author+'</td>';
+                        row += '</tr>';
+
+                    }
+                    row += '</table>';
+                    $('#foundForm').append(row);
+                },
+                error: function(e) {
+                    let result = e.responseText;
+                    $('#foundForm').html(result);
+                }
+            });
+        }
+
+        function showBookList()
+        {
+            let book = {
+                booktitle: $("#booktitle").val(),
+                isbn: $("#isbn").val(),
+                author: $("#author").val()
+            }
+            $.ajax({
+                url:     "/book/show",
+                type:     "POST",
+                contentType: "application/json",
+                dataType: 'json',
+                data: JSON.stringify(book),
+                success: function(data) {
+                    $("#resultForm").empty();
+                    var row = '<table border=\'1\'><tr><th>Title</th><th>ISBN</th><th>Author</th></tr>';
+                    var d = 'bookList';
+                    for (var i = 0; i < data[d].length; i++)
+                    {
+                        row += '<tr><td>'+data[d][i].booktitle+'</td>';
+                        row += '<td>'+data[d][i].isbn+'</td>';
+                        row += '<td>'+data[d][i].author+'</td>';
+                        row += '</tr>';
+
+                    }
+                    row += '</table>';
+                    $('#resultForm').append(row);
+                },
+                error: function(e) {
+                    let result = e.responseText;
+                    $('#resultForm').html(result);
+                }
+            });
+        }
+    });
+
+
+</script>
+
 <body>
-<form th:method="post" th:object="${bookDto}">
-    title: <input th:field="*{title}">
-    <br />
-    isbn: <input th:field="*{isbn}">
-    <br />
-    author: <input th:field="*{author}">
-    <br />
-    <button name="submit" type="submit">Save</button>
-    <button name="showAll" type="submit">Show All</button>
-</form>
-<table border="1">
-    <tr>
-        <th>Title</th>
-        <th>ISBN</th>
-        <th>Author</th>
-    </tr>
-    <tr th:each="book, state : ${bookList}"
-        class="row" th:classappend="${state.odd} ? 'odd-row' : 'even-row'">
-        <td th:utext="${book.title}">Title</td>
-        <td th:utext="${book.isbn}">ISBN</td>
-        <td th:utext="${book.author}">Author</td>
-    </tr>
-</table>
-<br>
-<br>
-<br>
-<form th:method="post">
-    What to find: <input type="text" th:value="${findStr}" name="findStr"/>
-    <button name="find" type="submit">Find Book</button>
-</form>
+    <div>
+        <form id="inputForm" th:method="post" th:object="${bookDto}">
+            <div>
+                <label>
+                <input name="booktitle" id="booktitle" type="text" placeholder="Title" th:utext="${bookDto.booktitle}">
+                </label>
+            </div>
+
+            <br />
+            <div>
+                <label>
+                    <input name="isbn" id="isbn" type="text" placeholder="ISBN" th:utext="${bookDto.isbn}">
+                </label>
+            </div>
+
+            <br />
+            <div>
+                <input name="author" id="author" type="text" placeholder="Author" th:utext="${bookDto.author}">
+            </div>
+            <br />
+            <div>
+                <button id="submit" type="submit" >Save</button>
+            </div>
+
+        </form>
+    </div>
+    <br>
+    <div id = "resultForm">
+    </div>
+
+    <br>
+    <br>
+    <br>
 
 
-<table border="1">
-    <tr>
-        <th>Title</th>
-        <th>ISBN</th>
-        <th>Author</th>
-    </tr>
-    <tr th:each="book, state : ${foundBookList}"
-        class="row" th:classappend="${state.odd} ? 'odd-row' : 'even-row'">
-        <td th:utext="${book.title}">Title</td>
-        <td th:utext="${book.isbn}">ISBN</td>
-        <td th:utext="${book.author}">Author</td>
-    </tr>
-</table>
+    <form id="findForm" th:method="post">
+        <div>
+            <label>
+                <input name="findStr" id="findStr" type="text" placeholder="What to find:">
+            </label>
+        </div>
+        <br>
+         <div>
+             <button id="find" type="submit">Find Book</button>
+         </div>
+    </form>
+
+    <br>
+    <div id = "foundForm">
+    </div>
+
 </body>
 </html>

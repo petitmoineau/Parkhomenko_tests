@@ -1,14 +1,15 @@
 package com.example.library.controller;
 
+import com.example.library.model.AjaxResponseBody;
 import com.example.library.model.BookDto;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.CollectionUtils;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Controller
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 public class BookController {
 
     ArrayList<BookDto> bookList = new ArrayList<>();
+    AjaxResponseBody showResult = new AjaxResponseBody();
 
     @GetMapping("/create")
     public String bookFormGet(Model model)
@@ -24,31 +26,68 @@ public class BookController {
         return "book-create";
     }
 
-    @RequestMapping(value="/create", method=RequestMethod.POST, params="submit")
-    public String saveBook(String findStr, BookDto bookDto, Model model)
-    {
-        bookList.add(bookDto);
+    @PostMapping("/show")
+    public ResponseEntity<?> rememberBookViaAjax(
+            @RequestBody BookDto bookDto, Errors errors) {
 
-        return "book-create";
+        if (errors.hasErrors()) {
+
+            showResult.setMsg(errors.getAllErrors()
+                    .stream().map(x -> x.getDefaultMessage())
+                    .collect(Collectors.joining(",")));
+
+            return ResponseEntity.badRequest().body(showResult);
+
+        }
+
+        else
+        {
+            bookList.add(bookDto);
+            showResult.setMsg("success");
+            showResult.addBook(bookDto);
+
+            return ResponseEntity.ok(showResult);
+        }
+
     }
 
-    @RequestMapping(value="/create", method= RequestMethod.POST, params="showAll")
-    public String redirect(BookDto bookDto, Model model)
-    {
-        model.addAttribute("bookList", bookList);
+    @PostMapping("/find")
+    public ResponseEntity<?> findBookViaAjax(
+            @RequestBody String findStr, Errors errors) {
 
-        return "book-create";
+
+        AjaxResponseBody findResult = new AjaxResponseBody();
+        if (errors.hasErrors()) {
+
+            findResult.setMsg(errors.getAllErrors()
+                    .stream().map(x -> x.getDefaultMessage())
+                    .collect(Collectors.joining(",")));
+
+            return ResponseEntity.badRequest().body(findResult);
+
+        }
+
+        else
+        {
+            findResult.setMsg("success");
+            List<BookDto> result = bookList.stream()
+                    .filter(item -> item.getBooktitle().contains(findStr) || item.getIsbn().contains(findStr))
+                    .collect(Collectors.toList());
+            findResult.setBookList(new ArrayList<BookDto>(result));//?
+            return ResponseEntity.ok(findResult);
+        }
     }
 
-    @RequestMapping(value="/create", method= RequestMethod.POST, params="find")
+
+    /*@RequestMapping(value="/create", method= RequestMethod.POST, params="findStr")
     public String find(BookDto bookDto, @RequestParam String findStr, Model model)
     {
         List<BookDto> result = bookList.stream()
-                .filter(item -> item.getTitle().contains(findStr) || item.getIsbn().contains(findStr))
+                .filter(item -> item.getBooktitle().contains(findStr) || item.getIsbn().contains(findStr))
                 .collect(Collectors.toList());
 
         model.addAttribute("foundBookList", result);
 
         return "book-create";
-    }
+    }*/
 }
