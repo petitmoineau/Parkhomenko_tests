@@ -77,17 +77,4 @@ public class BookController {
             return ResponseEntity.ok(findResult);
         }
     }
-
-
-    /*@RequestMapping(value="/create", method= RequestMethod.POST, params="findStr")
-    public String find(BookDto bookDto, @RequestParam String findStr, Model model)
-    {
-        List<BookDto> result = bookList.stream()
-                .filter(item -> item.getBooktitle().contains(findStr) || item.getIsbn().contains(findStr))
-                .collect(Collectors.toList());
-
-        model.addAttribute("foundBookList", result);
-
-        return "book-create";
-    }*/
 }
